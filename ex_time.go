@@ -10,11 +10,11 @@ const top_limit = 10800 // Number of Seconds in 3 hours
 const hourCount = 3600  // One Hour if tick duration = 1 second
 const minCount = 60     // One Minute if tick duration = 1 second
 
-const msecond = 1000000 // Tick Duration multiplier for Nanoseconds (1 millisecond)
+const msec = 1000000 * time.Nanosecond // Tick Duration multiplier (1 millisecond)
 const tsec = time.Second
 
 // Set timeDuration -- Time between Ticks
-var timeDuration = tsec
+var timeDuration = msec
 
 // Default Time Marker variables
 var bong = "Bong"
@@ -54,7 +54,7 @@ func clock() {
 		case msg := <-sec:
 			fmt.Println(msg)
 		case <-stop:
-			break
+			return
 		}
 	}
 }
