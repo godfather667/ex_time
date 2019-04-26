@@ -22,8 +22,8 @@ func init() {
 func TestTickClock(t *testing.T) {
 
 	//	timeDuration = time.Second    // Tick time Period
-	timeDuration = msec                // Test Tick Time Period
-	result := make([]string, 0, 10800) // Clock result
+	timeDuration = msec                    // Test Tick Time Period
+	result := make([]string, 0, top_limit) // Clock result
 
 	sec := make(chan string)
 	stop := make(chan bool)
