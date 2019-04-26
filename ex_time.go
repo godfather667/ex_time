@@ -1,3 +1,4 @@
+// ex_time.go - Test Program for an example of golang testing.
 package main
 
 import (

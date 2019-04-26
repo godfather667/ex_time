@@ -1,3 +1,4 @@
+// ex_time_test.go -- Test Functions for ex_time.go
 package main
 
 import (
@@ -19,6 +20,7 @@ func init() {
 	timeDuration = tsec
 }
 
+// TestTickClock -- Test the "tickClock
 func TestTickClock(t *testing.T) {
 
 	//	timeDuration = time.Second    // Tick time Period
@@ -68,6 +70,7 @@ func TestTickClock(t *testing.T) {
 	}
 }
 
+// TestClock -- Test the "clock" Function
 func TestClock(t *testing.T) {
 
 	//	timeDuration = time.Second    // Tick time Period
