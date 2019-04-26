@@ -41,7 +41,6 @@ func tickClock(sec chan<- string, stop chan<- bool) {
 			break
 		}
 	}
-	//	fmt.Println(bong)
 	stop <- true
 }
 
