@@ -19,7 +19,7 @@ func init() {
 	timeDuration = tsec
 }
 
-func TestClock(t *testing.T) {
+func TestTickClock(t *testing.T) {
 
 	//	timeDuration = time.Second    // Tick time Period
 	timeDuration = msec                // Test Tick Time Period
@@ -66,4 +66,11 @@ func TestClock(t *testing.T) {
 			return
 		}
 	}
+}
+
+func TestClock(t *testing.T) {
+
+	//	timeDuration = time.Second    // Tick time Period
+	timeDuration = msec // Test Tick Time Period
+	go clock()
 }

@@ -21,6 +21,10 @@ var bong = "Bong"
 var tock = "Tock"
 var tick = "tick"
 
+// tickClock  -- Tick Duration = 1 Second
+// Prints "Tock" for each 60 second period
+// Prints "Bong" for each 3,600 seconds
+// Prints "Tick" for each second that does not interfer with the other messages.
 func tickClock(sec chan<- string, stop chan<- bool) {
 	s := 0
 	ticker := time.NewTicker(timeDuration)
@@ -29,7 +33,6 @@ func tickClock(sec chan<- string, stop chan<- bool) {
 	for {
 		<-ticker.C
 		s++
-		fmt.Print(s, ": ")
 		if s%hourCount == 0 {
 			sec <- bong
 		} else if s%minCount == 0 {
@@ -44,6 +47,7 @@ func tickClock(sec chan<- string, stop chan<- bool) {
 	stop <- true
 }
 
+// Clock manages the tickClock execution displaying message from tickClock function
 func clock() {
 	sec := make(chan string)
 	stop := make(chan bool)
@@ -58,6 +62,8 @@ func clock() {
 	}
 }
 
+// Execcutive Function:
+// 	  executes "clock" Function and then exits
 func main() {
 	clock()    // Call Clock Function
 	os.Exit(0) // Exit on return
