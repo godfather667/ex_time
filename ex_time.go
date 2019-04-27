@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -19,6 +20,7 @@ const tsec = time.Second
 
 // Set timeDuration -- Time between Ticks
 var timeDuration = tsec
+var silent = false
 
 // Default Time Marker variables
 var bong = "Bong"
@@ -59,7 +61,9 @@ func clock() {
 	for {
 		select {
 		case msg := <-sec:
-			fmt.Println(msg)
+			if !silent {
+				fmt.Println(msg)
+			}
 		case <-stop:
 			return
 		}
@@ -95,11 +99,22 @@ func msgHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	// A very simple health check.
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	// In the future we could report back on the status of our DB, or our cache
+	// (e.g. Redis) by performing a simple PING, and include them in the response.
+	io.WriteString(w, `{"alive": true}`)
+}
+
 // Execcutive Function:
 // 	  executes "clock" Function and then exits
 func main() {
 	go clock() // Call Clock Function
 	http.HandleFunc("/", msgHandler)
+	http.HandleFunc("/health-check", HealthCheckHandler)
 	log.Fatal(http.ListenAndServe(":3000", nil))
 	//	os.Exit(0) // Exit on return
 }
