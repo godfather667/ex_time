@@ -15,9 +15,7 @@ const msec = 1000000 * time.Nanosecond // Tick Duration multiplier (1 millisecon
 const tsec = time.Second
 
 // Set timeDuration -- Time between Ticks
-var timeDuration = m
-
-sec
+var timeDuration = msec
 
 // Default Time Marker variables
 var bong = "Bong"
