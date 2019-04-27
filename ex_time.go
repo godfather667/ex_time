@@ -3,8 +3,11 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"log"
+	"net/http"
+	"strings"
 	"time"
+	"unicode"
 )
 
 const top_limit = 10800 // Number of Seconds in 3 hours
@@ -15,7 +18,7 @@ const msec = 1000000 * time.Nanosecond // Tick Duration multiplier (1 millisecon
 const tsec = time.Second
 
 // Set timeDuration -- Time between Ticks
-var timeDuration = msec
+var timeDuration = tsec
 
 // Default Time Marker variables
 var bong = "Bong"
@@ -63,9 +66,40 @@ func clock() {
 	}
 }
 
+func msgHandler(w http.ResponseWriter, r *http.Request) {
+	msg := r.URL.Path
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	}
+	fields := strings.FieldsFunc(msg, f)
+	if len(fields) >= 2 {
+		endp := strings.ToLower(fields[0])
+		val := fields[1]
+		switch endp {
+		case "tick":
+			tick = val
+			fmt.Fprintf(w, "Tick Changed to:  %s\n", val)
+		case "tock":
+			tock = val
+			fmt.Fprintf(w, "Tock Changed to:  %s\n", val)
+		case "bong":
+			bong = val
+			fmt.Fprintf(w, "Bong Changed to:  %s\n", val)
+		default:
+			fmt.Fprintf(w, "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\n")
+			fmt.Fprintf(w, "For example: localhost:3000/tick/new_word_here!")
+		}
+	} else {
+		fmt.Fprintf(w, "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\n")
+		fmt.Fprintf(w, "For example: localhost:3000/tick/new_word_here!")
+	}
+}
+
 // Execcutive Function:
 // 	  executes "clock" Function and then exits
 func main() {
-	clock()    // Call Clock Function
-	os.Exit(0) // Exit on return
+	go clock() // Call Clock Function
+	http.HandleFunc("/", msgHandler)
+	log.Fatal(http.ListenAndServe(":3000", nil))
+	//	os.Exit(0) // Exit on return
 }
