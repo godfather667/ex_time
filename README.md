@@ -16,15 +16,15 @@ The program allows changing tag messages via browser at **localhost:3000**
 
 The allowable tags are **tick, tock, or bong**. 
 
-	**To change tags use the tag as an endpoint followed by the new tag value:
-	
-	localhost:3000/tick/new_tag_word<cr>**
+**_To change tags use the tag as an endpoint followed by the new tag value:
+
+localhost:3000/tick/new_tag_word<cr>_**
 
 If an invalid end point is entered, the following message is displayed:
 
-         **Invalid Endpoint: Must be "tick" or "tock" or "bong"
-       
-       For Example: localhost:3000/tick/new_word_here!**
+**_Invalid Endpoint: Must be "tick" or "tock" or "bong"
+      
+For Example: localhost:3000/tick/new_word_here!_**
 
 The testing code is in **test_time_test.go**
 
