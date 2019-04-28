@@ -113,8 +113,8 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 // 	  executes "clock" Function and then exits
 func main() {
 	go clock() // Call Clock Function
+	// HTTP Handers, Processing Loop
 	http.HandleFunc("/", msgHandler)
 	http.HandleFunc("/health-check", HealthCheckHandler)
 	log.Fatal(http.ListenAndServe(":3000", nil))
-	//	os.Exit(0) // Exit on return
 }

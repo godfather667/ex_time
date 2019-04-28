@@ -28,6 +28,10 @@ If an invalid end point is entered, the following message is displayed:
 
 The testing code is in **test_time_test.go**
 
-It provides 87% Coverage
+It provides 85.4% Coverage
 
-It has two test functions:  TestTickClock and TestClock
+It has 4 test functions:  
+ * TestTickClock
+ * TestClock
+ * TestHealthCheckHandler
+ * TestMsgHandler

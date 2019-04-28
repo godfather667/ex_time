@@ -13,6 +13,12 @@ const tickCount = 10620
 const tockCount = 177
 const bongCount = 3
 
+var testCode = []string{"/tick/test", "Tick Changed to:  test\n",
+	"/tock/test", "Tock Changed to:  test\n",
+	"/bong/test", "Bong Changed to:  test\n",
+	"/Fail/Test", "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\nFor example: localhost:3000/tick/new_word_here!",
+	"/Short", "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\nFor example: localhost:3000/tick/new_word_here!"}
+
 func init() {
 	// Set Initial State for Messages
 	bong = "Bong"
@@ -113,5 +119,37 @@ func TestHealthCheckHandler(t *testing.T) {
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
+	}
+}
+
+// HealthChackHandler - Checks Health of HTTP Connection
+func TestMsgHandler(t *testing.T) {
+	for i := 0; i < 10; i += 2 {
+		// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
+		// pass 'nil' as the third parameter.
+		req, err := http.NewRequest("GET", testCode[i], nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(msgHandler)
+
+		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+		// directly and pass in our Request and ResponseRecorder.
+		handler.ServeHTTP(rr, req)
+
+		// Check the status code is what we expect.
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v",
+				status, http.StatusOK)
+		}
+
+		// Check the response body is what we expect.
+		if rr.Body.String() != testCode[i+1] {
+			t.Errorf("handler returned unexpected body: got %v want %v",
+				rr.Body.String(), testCode[i+1])
+		}
 	}
 }
