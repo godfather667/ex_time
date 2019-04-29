@@ -1,4 +1,4 @@
-// ex_time_test.go -- Test Functions for ex_time.go
+// ex_time_test.go -- Test Functions for ex_time.go.
 package main
 
 import (
@@ -13,12 +13,14 @@ const tickCount = 10620
 const tockCount = 177
 const bongCount = 3
 
+// Test Reponses for testMsgHandler Function.
 var testCode = []string{"/tick/test", "Tick Changed to:  test\n",
 	"/tock/test", "Tock Changed to:  test\n",
 	"/bong/test", "Bong Changed to:  test\n",
 	"/Fail/Test", "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\nFor example: localhost:3000/tick/new_word_here!",
 	"/Short", "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\nFor example: localhost:3000/tick/new_word_here!"}
 
+// Global Initialization Values.
 func init() {
 	// Set Initial State for Messages
 	bong = "Bong"
@@ -26,26 +28,34 @@ func init() {
 	tick = "Tick"
 	// Set standard Tick Duration (1 Second)
 	timeDuration = msec
+	// Set silent running for testing (So only the test generated messages are present).
+	// The outputs of ex_time.go are still available to the testing functions, but are
+	// not displayed on the console. This makes for a cleaner looking test.
 	silent = true
 }
 
-// TestTickClock -- Test the "tickClock
+// TestTickClock -- Test the "tickClock.
 func TestTickClock(t *testing.T) {
 
-	//	timeDuration = time.Second    // Tick time Period
-	timeDuration = msec                    // Test Tick Time Period
-	result := make([]string, 0, top_limit) // Clock result
+	// Set Test Tick Time Period of "1 msec" for testing (Improves run time significantly).
+	//   NOTE: The test period could less thab 1 msec - but this might lead to latency issues.
+	timeDuration = msec                    // 1 Millisecond Period.
+	result := make([]string, 0, top_limit) // Clock result buffer
 
-	sec := make(chan string)
-	stop := make(chan bool)
-	go tickClock(sec, stop)
+	sec := make(chan string) // Channel for reporting Ticks form tickClock.
+	stop := make(chan bool)  // Channel for reporting end of Ticks
+	go tickClock(sec, stop)  // Launch tickClock Function
+
 	for {
 		select {
-		case msg := <-sec:
+		// Handle Message Processing
+		case msg := <-sec: // Acquire Tick Message Value.
 			if !silent {
-				fmt.Println(msg)
+				fmt.Println(msg) // Suppress message to console -
 			}
-			result = append(result, msg)
+			result = append(result, msg) //append msg to result buffer
+
+		// Handle Stop Ticks Channel and compute and evaluate results.
 		case <-stop:
 			l := len(result)
 			if !silent {
@@ -54,7 +64,7 @@ func TestTickClock(t *testing.T) {
 			if l != top_limit {
 				t.Errorf("Number of ticks incorrect, got: %d, want: %d", l, top_limit)
 			}
-			// Compute Freq of Messages
+			// Compute Freq of Messages to verify correct number of each message.
 			recTick := 0
 			recTock := 0
 			recBong := 0
@@ -69,6 +79,7 @@ func TestTickClock(t *testing.T) {
 					recBong++
 				}
 			}
+			// Verify that records number of each tag message are correct.
 			if recTick != tickCount {
 				t.Errorf("Number of ticks incorrect, got: %d, want: %d", recTick, tickCount)
 			}
@@ -86,12 +97,13 @@ func TestTickClock(t *testing.T) {
 // TestClock -- Test the "clock" Function
 func TestClock(t *testing.T) {
 
-	//	timeDuration = time.Second    // Tick time Period
-	timeDuration = msec // Test Tick Time Period
-	go clock()
+	//	timeDuration = 1 millisecond   // Tick time Period
+	timeDuration = msec
+	go clock() // Launch Clock Function
 }
 
-// HealthChackHandler - Checks Health of HTTP Connection
+// TestHealthCheckHandler - Checks Health of HTTP Connection
+// NOTE - In Future Refactor testMsgHandler to perform this test also.
 func TestHealthCheckHandler(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
@@ -122,7 +134,8 @@ func TestHealthCheckHandler(t *testing.T) {
 	}
 }
 
-// HealthChackHandler - Checks Health of HTTP Connection
+// TestMsgHandler -- Test Endpoint Processing
+
 func TestMsgHandler(t *testing.T) {
 	for i := 0; i < 10; i += 2 {
 		// Create a request to pass to our handler. We don't have any query parameters for now, so we'll

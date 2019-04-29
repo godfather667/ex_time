@@ -1,4 +1,19 @@
-// ex_time.go - Test Program for an example of golang testing.
+// ex_time.go - An Demo Program with an example of golang testing.
+//
+//   This progam  counts seconds for three hours. Each Second it prints
+//   the tag "Tick" unless it is a minute period and then prints the tag "Tock".
+//   Finally, at hour periods it prints the tag "Bong".
+//
+//   An additional freature it allows changing the "tag" values by setting your
+//   browser to localhost:3000 and using the tags as endpoint for changing
+//	 Example:  localhost:3000/tick/new_tag_word.
+//
+//   The tag words may be any case, however the new_tag_word is displayed as is.
+//   The tags used for endpoints do not change, the tag "Tick" is always used
+//   to modify the Tick tag.
+//
+//   This program is almost fully tested with "ex_time_test.go".
+//
 package main
 
 import (
@@ -20,6 +35,8 @@ const tsec = time.Second
 
 // Set timeDuration -- Time between Ticks
 var timeDuration = tsec
+
+// Output Message Silencing for Testing
 var silent = false
 
 // Default Time Marker variables
@@ -54,6 +71,7 @@ func tickClock(sec chan<- string, stop chan<- bool) {
 }
 
 // Clock manages the tickClock execution displaying message from tickClock function
+// This was the orginal main function to improve testability.
 func clock() {
 	sec := make(chan string)
 	stop := make(chan bool)
@@ -70,6 +88,9 @@ func clock() {
 	}
 }
 
+// msgHandler -- This function interacts with the browser to update
+//    tag words.  It also displays on the browser a change notice.
+//    It also display an error and help message if tag is incorrect.
 func msgHandler(w http.ResponseWriter, r *http.Request) {
 	msg := r.URL.Path
 	f := func(c rune) bool {
@@ -77,8 +98,8 @@ func msgHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fields := strings.FieldsFunc(msg, f)
 	if len(fields) >= 2 {
-		endp := strings.ToLower(fields[0])
-		val := fields[1]
+		endp := strings.ToLower(fields[0]) // Converts tag to lowercase
+		val := fields[1]                   // val is the new tag word
 		switch endp {
 		case "tick":
 			tick = val
@@ -89,28 +110,30 @@ func msgHandler(w http.ResponseWriter, r *http.Request) {
 		case "bong":
 			bong = val
 			fmt.Fprintf(w, "Bong Changed to:  %s\n", val)
+
+			// The follwing message is displayed when no valid tag is isolated.
 		default:
 			fmt.Fprintf(w, "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\n")
 			fmt.Fprintf(w, "For example: localhost:3000/tick/new_word_here!")
 		}
+		// The follwing message is displayed when less than two fields isolated.
 	} else {
 		fmt.Fprintf(w, "Invalid Endpoint: Must be \"tick\" or \"tock\" or \"bong\"\n\n")
 		fmt.Fprintf(w, "For example: localhost:3000/tick/new_word_here!")
 	}
 }
 
+// HealthCheckHandler -- Is a simple check of HTTP Processing.
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	// A very simple health check.
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	// In the future we could report back on the status of our DB, or our cache
-	// (e.g. Redis) by performing a simple PING, and include them in the response.
 	io.WriteString(w, `{"alive": true}`)
 }
 
 // Execcutive Function:
-// 	  executes "clock" Function and then exits
+// 	  Executes the "clock" Function and then sets up the HTTP message handlers.
 func main() {
 	go clock() // Call Clock Function
 	// HTTP Handers, Processing Loop
